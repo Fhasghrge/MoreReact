@@ -1,36 +1,32 @@
-import React, { Component, lazy, Suspense } from 'react';
+import React, { Component } from 'react';
 import './App.css';
 
-const About = lazy(() => import(/* webpackChunkName: "about"*/ './about.jsx'));
-
-// ErrorBoundary
-// ComponentDidCatch
-class App extends Component {
-  state = {
-    hasError: false,
-  };
-  // 捕获边界错误
-  // componentDidCatch() {
-  //   this.setState({
-  //     hasError: true,
-  //   });
-  // }
-  static getDerivedStateFromError() {
-    return {
-      hasError: true
-    }
+class Foo extends Component {
+  shouldComponentUpdate(nprops, nstate) {
+    if(nprops.name === this.props.name) return false
+    else return true
   }
   render() {
-    if (this.state.hasError) {
-      return <div>Error</div>;
-    }
+    console.log('Foo render!');
     return (
       <>
-        <Suspense fallback={<div>loading...</div>}>
-          <About />
-        </Suspense>
+        Foo
       </>
-    );
+    )
+  }
+}
+class App extends Component {
+  state = {
+    count: 0
+  }
+  render() {
+    return (
+      <div>
+      <button onClick={() => this.setState({count: this.state.count + 1})}>ADD</button>
+      <p>{this.state.count}</p>
+      <Foo name="MIKE"/>
+      </div>
+    )
   }
 }
 export default App;
