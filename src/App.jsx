@@ -1,11 +1,14 @@
-import React, { Component } from 'react';
+import React, { Component, PureComponent } from 'react';
 import './App.css';
 
-class Foo extends Component {
-  shouldComponentUpdate(nprops, nstate) {
-    if(nprops.name === this.props.name) return false
-    else return true
-  }
+
+/**
+ * PureComponent中shouldComponentUpdate只进行浅比较，对于对象不进行深度比较
+ * shouldComponentUpdata进行比较时，
+ * 如果传入的是内联函数，每次都需要重新渲染，如果传入的是函数名，就不会
+ * 函数使用箭头函数可以使得 函数变为类的属性，不同显示绑定函数的this
+ * **/
+class Foo extends PureComponent {
   render() {
     console.log('Foo render!');
     return (
