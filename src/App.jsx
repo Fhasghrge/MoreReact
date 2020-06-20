@@ -1,28 +1,18 @@
-import React, { Component, memo } from 'react';
+import React, { useState } from 'react';
 import './App.css';
 
-/**
- * use "memo" in Function Component
- * make the render celebrate
- */
-const Foo = memo(function Foo(props) {
-  console.log('Foo render!');
-  return <>Foo</>;
-})
-class App extends Component {
-  state = {
-    count: 0,
-  };
-  render() {
-    return (
-      <div>
-        <button onClick={() => this.setState({ count: this.state.count + 1 })}>
-          ADD
-        </button>
-        <p>{this.state.count}</p>
-        <Foo name="MIKE" />
-      </div>
-    );
-  }
+const App = (props) => {
+
+  // useState use function paras to lazy init to celebrate
+  const [count, setCount] = useState(() => {
+    console.log('init Count');
+    return props.defaultCount || 0
+  });
+  return (
+    <div>
+      <button onClick={() => setCount(count + 1)}>Add</button>
+      <p>{count}</p>
+    </div>
+  );
 }
 export default App;
