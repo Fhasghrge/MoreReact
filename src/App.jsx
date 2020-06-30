@@ -1,4 +1,5 @@
 import React, { useState, useMemo, memo } from 'react';
+import { useCallback } from 'react';
 
 
 const Counter = memo(function Counter (props) {
@@ -10,15 +11,17 @@ const Counter = memo(function Counter (props) {
 
 function App() {
   const [count, setCount] = useState(0);
-  
+
   const double = useMemo( () => { // 依赖变量，防止频繁加载
     return count * 2
   }, [count === 3])
 
-  const onClick = useMemo(() => { // 只会添加一次句柄
-    return () => {
+  /**
+   * if useMemo return function => useCallback to replace it
+   * when handler need, use empty array to replace
+   */
+  const onClick = useCallback(() => {
       console.log('Click');
-    }
   }, [])
 
   return (
