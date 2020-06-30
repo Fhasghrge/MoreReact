@@ -1,42 +1,76 @@
-import React, { PureComponent, useState, useMemo, useEffect } from 'react';
-import { useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRef } from 'react';
+import { useCallback } from 'react';
 
-class Counter extends PureComponent {
-  speak() {
-    console.log(`now Counter is ${this.props.count}`);
-  }
-  render() {
-    const { props } = this;
-    return <div onClick={props.onClick}>{props.count}</div>;
-  }
+/**
+ *
+ * @param {*} count
+ * return jsx as component
+ */
+function useCounter(count) {
+  const size = useSize();
+  return (
+    <div>
+      {count}
+      <p>
+        size: {size.width} x {size.height}
+      </p>
+    </div>
+  );
 }
-
-function App() {
-  const [count, setCount] = useState(0);
-
-  const countRef = useRef();
-
-  const double = useMemo(() => {
-    // 依赖变量，防止频繁加载
-    return count * 2;
-  }, [count === 3]);
-
-  // let it;
-  const it = useRef()
-  /**
-   * if useMemo return function => useCallback to replace it
-   * when handler need, use empty array to replace
-   */
-  const onClick = useCallback(() => {
-    console.log('Click');
-    console.log(countRef.current);
-    countRef.current.speak();
-  }, [countRef]);
+/**
+ *
+ * @param {*} defaultCount
+ * Hooks function
+ */
+function useCount(defaultCount) {
+  // "self defined hook component" must start with 'use'
+  const [count, setCount] = useState(defaultCount);
+  const it = useRef();
 
   useEffect(() => {
     it.current = setInterval(() => {
-      setCount(count => count + 1);
+      setCount((count) => count + 1);
+    }, 1000);
+  }, []);
+
+  useEffect(() => {
+    if (count >= 10) {
+      clearInterval(it.current);
+    }
+  });
+  return [count, setCount];
+}
+
+function useSize() {
+  const [size, setSzie] = useState({
+    width: document.documentElement.clientWidth,
+    height: document.documentElement.clientHeight,
+  });
+  const onResize = useCallback(() => {
+    setSzie({
+      width: document.documentElement.clientWidth,
+      height: document.documentElement.clientHeight,
+    });
+  }, []);
+  useEffect(() => {
+    window.addEventListener('resize', onResize, false);
+    return () => {
+      window.removeEventListener('resize', onResize, false);
+    };
+  }, []);
+
+  return size;
+}
+
+function App() {
+  const [count, setCount] = useCount(0);
+  const it = useRef();
+  const Counter = useCounter(count);
+  const size = useSize();
+  useEffect(() => {
+    it.current = setInterval(() => {
+      setCount((count) => count + 1);
     }, 1000);
   }, []);
 
@@ -47,10 +81,13 @@ function App() {
   });
   return (
     <div>
-      <Counter ref={countRef} count={double} onClick={onClick}></Counter>
+      {Counter}
       <div>
         <button onClick={() => setCount(count + 1)}>click</button>={'>'} {count}
       </div>
+      <p>
+        size: {size.width} x {size.height}
+      </p>
     </div>
   );
 }
