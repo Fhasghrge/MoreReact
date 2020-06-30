@@ -1,21 +1,29 @@
-import React, { useState, createContext, useContext } from 'react';
+import React, { useState, useMemo, memo } from 'react';
 
-const CountContext = createContext();
 
-function Counter () {
-  const count = useContext(CountContext)
+const Counter = memo(function Counter (props) {
+  console.log('Counter render');
   return (
-    <div>{count}</div>
+    <div onClick={props.onClick}>{props.count}</div>
   )
-}
+})
 
 function App() {
   const [count, setCount] = useState(0);
+  
+  const double = useMemo( () => { // 依赖变量，防止频繁加载
+    return count * 2
+  }, [count === 3])
+
+  const onClick = useMemo(() => { // 只会添加一次句柄
+    return () => {
+      console.log('Click');
+    }
+  }, [])
+
   return (
     <div>
-      <CountContext.Provider value={count}>
-        <Counter/>
-      </CountContext.Provider>
+      <Counter count={double} onClick={onClick}></Counter>
       <div>
         <button onClick={() => setCount(count + 1)}>click</button>={'>'} {count}
       </div>
